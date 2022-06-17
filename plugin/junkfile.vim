@@ -6,7 +6,7 @@ endif
 let g:junkfile#loaded = 1
 
 function! s:get_workspace_path() abort
-  let path = get(g:, 'junkfile#workspace_path', '')
+  let path = get(g:, 'junkfile#workspace_path', '~/junk/%Y/%m%d')
   let is_cmd = get(g:, 'junkfile#workspace_path_is_shell_command', 0)
 
   if is_cmd
@@ -14,7 +14,7 @@ function! s:get_workspace_path() abort
     let workdir = workdir[0:(strlen(workdir)-2)]
     return workdir
   else
-    return path
+    return expand(strftime(path))
   endif
 endfunction
 
@@ -25,9 +25,18 @@ function! s:make_and_edit_tmp(ext) abort
     return
   endif
 
-  let filename = expand(workdir .. '/junk_' .. strftime('%H%M%S') .. '.' .. a:ext)
-  let edit_command = expand('%') ==# '' && &filetype ==# '' ? 'edit' : 'tabnew'
-  execute ':' .. edit_command .. ' ' .. filename
+  let filename = expand(
+    \   printf(
+    \     "%s/junk_%s.%s",
+    \     workdir,
+    \     strftime('%H%M%S'),
+    \     a:ext
+    \   )
+    \ )
+  let edit_command = expand('%') ==# '' && &filetype ==# ''
+    \ ? 'edit' : 'tabnew'
+  execute printf('%s %s', edit_command, filename)
 endfunction
 
-command! -nargs=1 -complete=filetype Junkfile call s:make_and_edit_tmp(<f-args>)
+command! -nargs=1 -complete=filetype
+  \ Junkfile call s:make_and_edit_tmp(<f-args>)
