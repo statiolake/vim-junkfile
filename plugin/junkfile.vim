@@ -6,16 +6,8 @@ endif
 let g:junkfile#loaded = 1
 
 function! s:get_workspace_path() abort
-  let path = get(g:, 'junkfile#workspace_path', '~/junk/%Y/%m%d')
-  let is_cmd = get(g:, 'junkfile#workspace_path_is_shell_command', 0)
-
-  if is_cmd
-    let workdir = system(path)
-    let workdir = workdir[0:(strlen(workdir)-2)]
-    return workdir
-  else
-    return expand(strftime(path))
-  endif
+  let path = get(g:, 'junkfile#workspace_path', strftime('~/junk/%Y/%m%d'))
+  return expand(path)
 endfunction
 
 function! s:make_and_edit_tmp(ext) abort
